@@ -1,6 +1,5 @@
-// @flow
 import * as React from 'react';
-import {LegacyRef, MutableRefObject, useRef, useState} from "react";
+import {useRef, useState} from "react";
 
 type Props = {
     article: string;
@@ -10,7 +9,8 @@ type Props = {
 export function ArticleInput({article, index}: Props) {
     const ref = useRef(null);
 
-    const [value, setValue] = useState(article[0]);
+    const [placeholder] = useState(article[0]);
+    const [value, setValue] = useState("");
 
     const handleChange = (change: React.ChangeEvent<HTMLInputElement>) => {
         if (change.target.value.length < 1) {
@@ -20,15 +20,12 @@ export function ArticleInput({article, index}: Props) {
         setValue(change.target.value)
     };
 
-    function handleFocus(focus: React.FocusEvent<HTMLInputElement>) {
-        // TODO should actually skip the first character
-        console.log(focus);
-        document.dispatchEvent(new KeyboardEvent('keypress', {
-            key: 'ArrowLeft',
-        }));
-    }
-
     return (
-        <input ref={ref} name={String(index)} onChange={(change) => handleChange(change)} value={value} onFocus={focus => handleFocus(focus)}/>
+        <input ref={ref}
+               name={String(index)}
+               onChange={(change) => handleChange(change)}
+               placeholder={placeholder}
+               value={value}
+               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 m-0.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"/>
     );
 };

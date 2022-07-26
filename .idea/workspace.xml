@@ -5,15 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3486e2be-403b-47af-8625-6343cca643a1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/azure/azureSettings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/ArticleInput.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/OriginalInput.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/Processor.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contexts/ScoreContext.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/c/8c258232cbcd5d83991c524a9e86c8d3f984fc57" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ArticleInput.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ArticleInput.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/OriginalInput.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/OriginalInput.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Processor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Processor.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles/Home.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles/Home.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,6 +81,8 @@
       <workItem from="1658685294016" duration="326000" />
       <workItem from="1658685641020" duration="6799000" />
       <workItem from="1658698124342" duration="1802000" />
+      <workItem from="1658764163573" duration="1054000" />
+      <workItem from="1658846857501" duration="2544000" />
     </task>
     <servers />
   </component>
