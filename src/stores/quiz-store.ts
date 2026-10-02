@@ -1,7 +1,5 @@
 import { create } from "zustand"
 
-import { randomSample } from "@/lib/quiz"
-
 interface QuizState {
   original: string
   source: string
@@ -13,12 +11,9 @@ interface QuizState {
   reset(): void
 }
 
-const first = randomSample()
-
 export const useQuiz = create<QuizState>((set) => ({
-  // A public-domain text is loaded on every visit, so the quiz is ready as soon as the page opens.
-  original: first.text,
-  source: first.source,
+  original: "",
+  source: "",
   answers: {},
   submitted: false,
   start: (original, source = "") => set({ original, source, answers: {}, submitted: false }),
