@@ -1,10 +1,112 @@
 @import "tailwindcss";
 @import "@fontsource-variable/inter";
+@import "@fontsource-variable/source-serif-4";
 
-@theme {
+/*
+ * Design tokens. Cool neutrals, an ink-navy primary, and one colour per grammatical gender
+ * (blue der, rose die, amber das) so the same cue repeats in the table, the badges and the review list.
+ * Right/wrong use green and red and are never used for gender.
+ */
+:root {
+  color-scheme: light;
+  --bg: oklch(0.982 0.004 255);
+  --surface: oklch(1 0 0);
+  --surface-2: oklch(0.962 0.006 255);
+  --border: oklch(0.905 0.008 255);
+  --border-strong: oklch(0.82 0.012 255);
+  --fg: oklch(0.22 0.03 265);
+  --fg-muted: oklch(0.49 0.025 265);
+  --primary: oklch(0.29 0.055 265);
+  --primary-fg: oklch(0.985 0.003 255);
+  --ring: oklch(0.58 0.14 265);
+
+  --good: oklch(0.45 0.11 155);
+  --good-bg: oklch(0.962 0.03 155);
+  --good-border: oklch(0.82 0.08 155);
+  --bad: oklch(0.5 0.17 25);
+  --bad-bg: oklch(0.965 0.025 25);
+  --bad-border: oklch(0.83 0.09 25);
+
+  --masc: oklch(0.48 0.15 255);
+  --masc-bg: oklch(0.955 0.03 255);
+  --fem: oklch(0.5 0.17 350);
+  --fem-bg: oklch(0.96 0.03 350);
+  --neut: oklch(0.5 0.11 70);
+  --neut-bg: oklch(0.962 0.04 80);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: oklch(0.19 0.014 265);
+    --surface: oklch(0.235 0.016 265);
+    --surface-2: oklch(0.28 0.018 265);
+    --border: oklch(0.33 0.02 265);
+    --border-strong: oklch(0.42 0.025 265);
+    --fg: oklch(0.95 0.005 255);
+    --fg-muted: oklch(0.72 0.02 265);
+    --primary: oklch(0.93 0.015 255);
+    --primary-fg: oklch(0.22 0.04 265);
+    --ring: oklch(0.7 0.12 265);
+
+    --good: oklch(0.8 0.13 155);
+    --good-bg: oklch(0.29 0.045 155);
+    --good-border: oklch(0.45 0.08 155);
+    --bad: oklch(0.78 0.13 25);
+    --bad-bg: oklch(0.3 0.05 25);
+    --bad-border: oklch(0.48 0.1 25);
+
+    --masc: oklch(0.8 0.1 255);
+    --masc-bg: oklch(0.3 0.05 255);
+    --fem: oklch(0.8 0.11 350);
+    --fem-bg: oklch(0.3 0.05 350);
+    --neut: oklch(0.82 0.1 80);
+    --neut-bg: oklch(0.31 0.045 80);
+  }
+}
+
+@theme inline {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Source Serif 4 Variable", ui-serif, Georgia, serif;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--fg-muted);
+  --color-primary: var(--primary);
+  --color-primary-fg: var(--primary-fg);
+  --color-ring: var(--ring);
+  --color-good: var(--good);
+  --color-good-bg: var(--good-bg);
+  --color-good-border: var(--good-border);
+  --color-bad: var(--bad);
+  --color-bad-bg: var(--bad-bg);
+  --color-bad-border: var(--bad-border);
+  --color-masc: var(--masc);
+  --color-masc-bg: var(--masc-bg);
+  --color-fem: var(--fem);
+  --color-fem-bg: var(--fem-bg);
+  --color-neut: var(--neut);
+  --color-neut-bg: var(--neut-bg);
 }
 
 body {
-  @apply bg-white text-slate-900 antialiased dark:bg-slate-900 dark:text-slate-100;
+  @apply bg-bg font-sans text-fg antialiased;
+}
+
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-ring;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

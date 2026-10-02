@@ -6,7 +6,7 @@ import { createRoot } from "react-dom/client"
 
 import { routeTree } from "./routeTree.gen"
 
-const router = createRouter({ routeTree, defaultPreload: "intent" })
+const router = createRouter({ routeTree, defaultPreload: "intent", scrollRestoration: true })
 
 declare module "@tanstack/react-router" {
   interface Register {
