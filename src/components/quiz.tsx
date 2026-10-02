@@ -51,7 +51,13 @@ export function Quiz() {
       {submitted && <ResultSummary correct={results} onRetry={retry} onNew={reset} />}
 
       <section aria-label="Text" className="rounded-xl border border-border bg-surface p-5 sm:p-10">
-        <Passage tokens={tokens} answers={answers} submitted={submitted} onChange={setAnswer} />
+        <Passage
+          tokens={tokens}
+          answers={answers}
+          submitted={submitted}
+          explanations={sample?.explanations}
+          onChange={setAnswer}
+        />
       </section>
 
       {!submitted && (

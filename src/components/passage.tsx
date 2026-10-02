@@ -1,14 +1,17 @@
 import { ArticleField } from "@/components/article-field"
+import { WrongArticle } from "@/components/wrong-article"
 import { isCorrect, type Token } from "@/lib/quiz"
+import type { Explanation } from "@/lib/samples"
 
 type Props = {
   tokens: Token[]
   answers: Record<number, string>
   submitted: boolean
+  explanations?: Explanation[]
   onChange(id: number, value: string): void
 }
 
-export function Passage({ tokens, answers, submitted, onChange }: Props) {
+export function Passage({ tokens, answers, submitted, explanations, onChange }: Props) {
   return (
     <p className="font-serif text-xl leading-[2.4] whitespace-pre-line text-fg sm:text-[1.375rem]">
       {tokens.map((token, index) => {
@@ -38,15 +41,13 @@ export function Passage({ tokens, answers, submitted, onChange }: Props) {
         }
 
         return (
-          <a
+          <WrongArticle
             key={index}
-            href={`#mistake-${token.order}`}
-            title="See why"
-            className="mx-0.5 inline-flex items-baseline gap-1.5 rounded-sm border-b-2 border-bad-border bg-bad-bg px-1.5 font-sans text-base font-medium no-underline"
-          >
-            <s className="text-bad/80">{answer.trim() || "blank"}</s>
-            <span className="text-good">{token.article}</span>
-          </a>
+            order={token.order}
+            article={token.article}
+            answer={answer}
+            explanation={explanations?.[token.order]}
+          />
         )
       })}
     </p>
