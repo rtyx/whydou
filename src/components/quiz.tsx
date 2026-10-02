@@ -6,7 +6,7 @@ import { articlesOf, isCorrect, scoreOf, tokenize } from "@/lib/quiz"
 import { useQuiz } from "@/stores/quiz-store"
 
 export function Quiz() {
-  const { original, answers, submitted, setAnswer, submit, reset } = useQuiz()
+  const { original, source, answers, submitted, setAnswer, submit, reset } = useQuiz()
   const tokens = useMemo(() => tokenize(original), [original])
   const total = articlesOf(tokens).length
 
@@ -33,6 +33,8 @@ export function Quiz() {
           ),
         )}
       </p>
+
+      {source && <p className="text-center text-sm text-slate-500">{source} (public domain)</p>}
 
       {submitted ? (
         <div className="flex flex-col items-center gap-3">
