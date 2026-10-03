@@ -21,12 +21,13 @@ export function TextForm({ onStart }: { onStart(text: string, source?: Source): 
   return (
     <form onSubmit={submit} className="flex flex-col gap-10">
       <div className="flex flex-col items-center gap-3 text-center">
-        <p className="text-xs tracking-widest text-accent uppercase">Article practice</p>
-        <h1 className="font-serif text-5xl leading-[1.05] font-light tracking-tight text-fg sm:text-6xl">
-          Read it. <em className="text-sub">Fill in</em> the <em>der, die, das.</em>
+        <p className="text-xs tracking-widest text-accent uppercase">Artikel-Training</p>
+        <h1 className="font-display text-6xl leading-[1.05] font-semibold text-fg sm:text-8xl">
+          Der, die, <span className="text-rot">das</span>
+          <span className="text-accent">?</span>
         </h1>
         <p className="max-w-xl font-serif text-lg text-sub">
-          Paste any German text. Every article becomes a blank, and you bring them back.
+          Paste any German text. Every article becomes a blank. Fill in the der, die and das.
         </p>
       </div>
 

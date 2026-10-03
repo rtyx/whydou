@@ -20,7 +20,7 @@ export function Quiz() {
     <form onSubmit={onSubmit} className="flex flex-col gap-10">
       {submitted ? (
         <div className="flex items-end gap-6">
-          <p className="font-serif text-8xl leading-none font-light text-accent">
+          <p className="font-display text-9xl leading-none font-semibold text-accent">
             {total ? Math.round((score / total) * 100) : 0}
             <span className="text-5xl text-sub">%</span>
           </p>
@@ -29,7 +29,7 @@ export function Quiz() {
           </p>
         </div>
       ) : (
-        <p className="text-xs tracking-widest text-sub uppercase">{total} blanks</p>
+        <p className="text-xs tracking-widest text-sub uppercase">{total} Lücken</p>
       )}
 
       <article className="font-serif text-4xl leading-[1.8] font-light text-sub">
