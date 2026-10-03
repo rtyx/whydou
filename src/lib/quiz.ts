@@ -44,37 +44,40 @@ export const SAMPLES: Sample[] = [
   },
 ]
 
-const WIKIPEDIA_RANDOM = "https://de.wikipedia.org/api/rest_v1/page/random/summary"
+const WIKIPEDIA_API = "https://de.wikipedia.org/w/api.php"
+const WIKIPEDIA_RANDOM =
+  `${WIKIPEDIA_API}?action=query&format=json&origin=*&generator=random&grnnamespace=0&grnlimit=20` +
+  "&prop=extracts%7Cinfo&exintro=1&explaintext=1&exlimit=max&inprop=url"
 const MIN_ARTICLES = 5
 const MIN_LENGTH = 250
-const ATTEMPTS = 6
+const MAX_LENGTH = 900
 
 function randomFallback(): Sample {
   return SAMPLES[Math.floor(Math.random() * SAMPLES.length)]
 }
 
 /**
- * A random German Wikipedia summary. Wikipedia text is CC BY-SA 4.0, so the result carries the article link and
- * license for attribution. Short or article-free summaries are skipped. Falls back to a bundled public-domain text
- * when offline or when no suitable article turns up.
+ * A random German Wikipedia intro. Wikipedia text is CC BY-SA 4.0, so the result carries the article link and
+ * license for attribution. One request returns many random articles; short or article-free ones are skipped. Falls back
+ * to a bundled public-domain text when offline or when no suitable article turns up.
  */
 export async function randomSample(): Promise<Sample> {
   try {
-    for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
-      const response = await fetch(WIKIPEDIA_RANDOM, { headers: { Accept: "application/json" } })
-      if (!response.ok) break
-      const page = (await response.json()) as {
-        title?: string
-        extract?: string
-        content_urls?: { desktop?: { page?: string } }
-      }
-      const text = page.extract?.trim() ?? ""
-      if (text.length < MIN_LENGTH || articlesOf(tokenize(text)).length < MIN_ARTICLES) continue
+    const response = await fetch(WIKIPEDIA_RANDOM)
+    if (!response.ok) return randomFallback()
+    const data = (await response.json()) as {
+      query?: { pages?: Record<string, { title: string; extract?: string; fullurl?: string }> }
+    }
+    const pages = Object.values(data.query?.pages ?? {}).sort(() => Math.random() - 0.5)
+    for (const page of pages) {
+      const text = (page.extract ?? "").split("\n")[0].trim()
+      if (text.length < MIN_LENGTH || text.length > MAX_LENGTH) continue
+      if (articlesOf(tokenize(text)).length < MIN_ARTICLES) continue
       return {
         text,
         source: {
           label: `Wikipedia, „${page.title}“`,
-          url: page.content_urls?.desktop?.page,
+          url: page.fullurl,
           license: "CC BY-SA 4.0",
           licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
         },

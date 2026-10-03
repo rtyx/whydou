@@ -1,6 +1,8 @@
 import { useMemo, type FormEvent } from "react"
 
 import { ArticleInput } from "@/components/article-input"
+import { WrongAnswer } from "@/components/wrong-answer"
+import { explainAll, type Explanation } from "@/lib/analyze"
 import { Button } from "@/components/button"
 import { articlesOf, isCorrect, scoreOf, tokenize } from "@/lib/quiz"
 import { useQuiz } from "@/stores/quiz-store"
@@ -8,6 +10,7 @@ import { useQuiz } from "@/stores/quiz-store"
 export function Quiz() {
   const { original, source, answers, submitted, setAnswer, submit, reset } = useQuiz()
   const tokens = useMemo(() => tokenize(original), [original])
+  const explanations = useMemo(() => explainAll(tokens), [tokens])
   const total = articlesOf(tokens).length
   const score = scoreOf(tokens, answers)
 
@@ -37,12 +40,12 @@ export function Quiz() {
           token.kind === "text" ? (
             <span key={index}>{token.text}</span>
           ) : (
-            <ArticleInput
+            <Answer
               key={index}
               article={token.article}
-              value={answers[token.id] ?? ""}
-              status={!submitted ? "pending" : isCorrect(token.article, answers[token.id]) ? "correct" : "incorrect"}
-              disabled={submitted}
+              answer={answers[token.id] ?? ""}
+              submitted={submitted}
+              explanation={explanations[token.id]}
               onChange={(value) => setAnswer(token.id, value)}
             />
           ),
@@ -87,5 +90,32 @@ export function Quiz() {
       </div>
       {total === 0 && <p className="text-sm text-sub">No articles (der, die, das) found in this text.</p>}
     </form>
+  )
+}
+
+type AnswerProps = {
+  article: string
+  answer: string
+  submitted: boolean
+  explanation: Explanation
+  onChange(value: string): void
+}
+
+function Answer({ article, answer, submitted, explanation, onChange }: AnswerProps) {
+  const correct = isCorrect(article, answer)
+  const input = (
+    <ArticleInput
+      article={article}
+      value={answer}
+      status={!submitted ? "pending" : correct ? "correct" : "incorrect"}
+      disabled={submitted}
+      onChange={onChange}
+    />
+  )
+  if (!submitted || correct) return input
+  return (
+    <WrongAnswer article={article} answer={answer} explanation={explanation}>
+      {input}
+    </WrongAnswer>
   )
 }
