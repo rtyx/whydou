@@ -1,10 +1,61 @@
 @import "tailwindcss";
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/newsreader";
+@import "@fontsource-variable/newsreader/wght-italic.css";
+@import "@fontsource-variable/jetbrains-mono";
 
-@theme {
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+@theme inline {
+  --font-serif: "Newsreader Variable", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-fg: var(--fg);
+  --color-sub: var(--sub);
+  --color-accent: var(--accent);
+  --color-ok: var(--ok);
+  --color-bad: var(--bad);
+}
+
+/* Dark is the base; "system" (no data-theme) follows the OS. */
+:root {
+  color-scheme: dark;
+  --bg: #2c2e31;
+  --bg-deep: #232427;
+  --fg: #d1d0c5;
+  --sub: #6f7174;
+  --accent: #e2b714;
+  --ok: #8fbf7f;
+  --bad: #ca4754;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --bg: #eceef0;
+    --bg-deep: #dfe2e6;
+    --fg: #2c2e31;
+    --sub: #6b6f74;
+    --accent: #9a7200;
+    --ok: #2f7d32;
+    --bad: #c23b4a;
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #eceef0;
+  --bg-deep: #dfe2e6;
+  --fg: #2c2e31;
+  --sub: #6b6f74;
+  --accent: #9a7200;
+  --ok: #2f7d32;
+  --bad: #c23b4a;
 }
 
 body {
-  @apply bg-white text-slate-900 antialiased dark:bg-slate-900 dark:text-slate-100;
+  @apply bg-bg font-mono text-fg antialiased;
+}
+
+::selection {
+  @apply bg-accent text-bg;
 }

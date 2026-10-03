@@ -9,6 +9,7 @@ export function Quiz() {
   const { original, source, answers, submitted, setAnswer, submit, reset } = useQuiz()
   const tokens = useMemo(() => tokenize(original), [original])
   const total = articlesOf(tokens).length
+  const score = scoreOf(tokens, answers)
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault()
@@ -16,8 +17,22 @@ export function Quiz() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col items-stretch gap-4">
-      <p className="leading-12">
+    <form onSubmit={onSubmit} className="flex flex-col gap-10">
+      {submitted ? (
+        <div className="flex items-end gap-6">
+          <p className="font-serif text-8xl leading-none font-light text-accent">
+            {total ? Math.round((score / total) * 100) : 0}
+            <span className="text-5xl text-sub">%</span>
+          </p>
+          <p className="pb-2 text-sm text-sub">
+            {score} / {total} correct
+          </p>
+        </div>
+      ) : (
+        <p className="text-xs tracking-widest text-sub uppercase">{total} blanks</p>
+      )}
+
+      <article className="font-serif text-4xl leading-[1.8] font-light text-sub">
         {tokens.map((token, index) =>
           token.kind === "text" ? (
             <span key={index}>{token.text}</span>
@@ -32,27 +47,45 @@ export function Quiz() {
             />
           ),
         )}
-      </p>
+      </article>
 
-      {source && <p className="text-center text-sm text-slate-500">{source} (public domain)</p>}
+      {source && (
+        <p className="font-serif text-base text-sub italic">
+          —{" "}
+          {source.url ? (
+            <a href={source.url} target="_blank" rel="noreferrer" className="underline hover:text-fg">
+              {source.label}
+            </a>
+          ) : (
+            source.label
+          )}
+          {source.license && (
+            <span className="not-italic">
+              {" · "}
+              {source.licenseUrl ? (
+                <a href={source.licenseUrl} target="_blank" rel="noreferrer" className="underline hover:text-fg">
+                  {source.license}
+                </a>
+              ) : (
+                source.license
+              )}
+            </span>
+          )}
+        </p>
+      )}
 
-      {submitted ? (
-        <div className="flex flex-col items-center gap-3">
-          <h2 className="text-3xl font-semibold">
-            Score: {scoreOf(tokens, answers)} / {total}
-          </h2>
-          <Button type="button" onClick={reset}>
-            Try another text
+      <div className="flex items-center gap-1 self-center rounded-lg bg-bg-deep p-1">
+        {submitted ? (
+          <Button type="button" variant="ghostAccent" onClick={reset}>
+            try another text
           </Button>
-        </div>
-      ) : (
-        <Button type="submit" className="self-center" disabled={total === 0}>
-          Next!
-        </Button>
-      )}
-      {total === 0 && (
-        <p className="text-center text-sm text-slate-500">No articles (der, die, das) found in this text.</p>
-      )}
+        ) : (
+          <Button type="submit" variant="ghostAccent" disabled={total === 0}>
+            check
+          </Button>
+        )}
+      </div>
+      {total === 0 && <p className="text-sm text-sub">No articles (der, die, das) found in this text.</p>}
     </form>
   )
 }

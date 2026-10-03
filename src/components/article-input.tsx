@@ -1,16 +1,18 @@
 import { cva } from "class-variance-authority"
 
-const input = cva("m-0.5 w-20 rounded-lg border p-2.5 text-sm focus:ring-2", {
-  variants: {
-    status: {
-      pending:
-        "border-slate-300 bg-slate-50 text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400",
-      correct: "border-green-500 bg-green-50 text-green-900 focus:ring-green-500 dark:bg-slate-700 dark:text-green-400",
-      incorrect: "border-red-500 bg-red-50 text-red-900 focus:ring-red-500 dark:bg-slate-700 dark:text-red-500",
+const input = cva(
+  "mx-1 w-[3.4ch] rounded-sm border-b-2 bg-bg-deep px-0.5 text-center align-baseline font-mono text-[0.7em] outline-none placeholder:text-sub/60 focus:border-accent",
+  {
+    variants: {
+      status: {
+        pending: "border-sub text-accent",
+        correct: "border-ok text-ok",
+        incorrect: "border-bad text-bad",
+      },
     },
+    defaultVariants: { status: "pending" },
   },
-  defaultVariants: { status: "pending" },
-})
+)
 
 type Props = {
   article: string
@@ -30,6 +32,8 @@ export function ArticleInput({ article, value, status, disabled, onChange }: Pro
       aria-label="Article"
       aria-invalid={status === "incorrect"}
       autoComplete="off"
+      spellCheck={false}
+      maxLength={3}
       onChange={(event) => onChange(event.target.value)}
       className={input({ status })}
     />
