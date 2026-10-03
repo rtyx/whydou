@@ -1,13 +1,15 @@
 import { useState, type FormEvent } from "react"
 
 import { Button } from "@/components/button"
-import { randomSample } from "@/lib/quiz"
+import { randomSample, type Source } from "@/lib/quiz"
 
-export function TextForm({ onStart }: { onStart(text: string, source?: string): void }) {
+export function TextForm({ onStart }: { onStart(text: string, source?: Source): void }) {
   const [text, setText] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const startRandom = () => {
-    const sample = randomSample()
+  const startRandom = async () => {
+    setLoading(true)
+    const sample = await randomSample()
     onStart(sample.text, sample.source)
   }
 
@@ -41,8 +43,8 @@ export function TextForm({ onStart }: { onStart(text: string, source?: string): 
         <Button type="submit" variant="ghostAccent" disabled={!text.trim()}>
           start
         </Button>
-        <Button type="button" variant="outline" onClick={startRandom}>
-          random fairy tale
+        <Button type="button" variant="outline" onClick={startRandom} disabled={loading}>
+          {loading ? "fetching a text…" : "random text"}
         </Button>
       </div>
     </form>

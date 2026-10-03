@@ -19,9 +19,6 @@ export const Route = createRootRoute({
           <kbd className="rounded bg-sub/30 px-1.5 py-0.5 text-fg">tab</kbd> next blank ·{" "}
           <kbd className="rounded bg-sub/30 px-1.5 py-0.5 text-fg">enter</kbd> check
         </p>
-        <p>
-          Texts: Brüder Grimm, <i className="font-serif text-sm">Kinder- und Hausmärchen</i>, public domain.
-        </p>
       </footer>
     </div>
   ),

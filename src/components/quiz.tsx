@@ -49,7 +49,30 @@ export function Quiz() {
         )}
       </article>
 
-      {source && <p className="font-serif text-base text-sub italic">— {source}</p>}
+      {source && (
+        <p className="font-serif text-base text-sub italic">
+          —{" "}
+          {source.url ? (
+            <a href={source.url} target="_blank" rel="noreferrer" className="underline hover:text-fg">
+              {source.label}
+            </a>
+          ) : (
+            source.label
+          )}
+          {source.license && (
+            <span className="not-italic">
+              {" · "}
+              {source.licenseUrl ? (
+                <a href={source.licenseUrl} target="_blank" rel="noreferrer" className="underline hover:text-fg">
+                  {source.license}
+                </a>
+              ) : (
+                source.license
+              )}
+            </span>
+          )}
+        </p>
+      )}
 
       <div className="flex items-center gap-1 self-center rounded-lg bg-bg-deep p-1">
         {submitted ? (
