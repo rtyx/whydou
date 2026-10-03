@@ -1,10 +1,25 @@
 @import "tailwindcss";
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/newsreader";
+@import "@fontsource-variable/newsreader/wght-italic.css";
+@import "@fontsource-variable/jetbrains-mono";
 
 @theme {
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Newsreader Variable", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --color-bg: #2c2e31;
+  --color-bg-deep: #232427;
+  --color-fg: #d1d0c5;
+  --color-sub: #646669;
+  --color-accent: #e2b714;
+  --color-ok: #8fbf7f;
+  --color-bad: #ca4754;
 }
 
 body {
-  @apply bg-white text-slate-900 antialiased dark:bg-slate-900 dark:text-slate-100;
+  @apply bg-bg font-mono text-fg antialiased;
+}
+
+::selection {
+  @apply bg-accent text-bg;
 }
