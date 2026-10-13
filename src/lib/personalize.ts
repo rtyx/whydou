@@ -94,11 +94,15 @@ export function loadModel(onProgress: (fraction: number) => void = () => {}) {
   model ??= (async () => {
     const { pipeline } = await import("@huggingface/transformers")
     const files: Record<string, { loaded: number; total: number }> = {}
+    let shown = 0
     const generator = await pipeline("text-generation", MODEL, {
       dtype: "q4f16",
       device: "webgpu",
       progress_callback: (info) => {
-        if (info.status !== "progress") return
+        // Files arrive one after another and each total is only known once its download starts. The small config
+        // and tokenizer files come first, so counting them would show 100% before the weights even begin. Count only
+        // the weights, which are nearly all of the download, and never let the number go back.
+        if (info.status !== "progress" || !/\.onnx(_data)?$/.test(info.file)) return
         files[info.file] = { loaded: info.loaded, total: info.total }
         let loaded = 0
         let total = 0
@@ -106,7 +110,8 @@ export function loadModel(onProgress: (fraction: number) => void = () => {}) {
           loaded += file.loaded
           total += file.total
         }
-        if (total) onProgress(loaded / total)
+        if (total) shown = Math.max(shown, loaded / total)
+        onProgress(shown)
       },
     })
     return generator as unknown as Generate
