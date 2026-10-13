@@ -72,7 +72,7 @@ type Client = Navigator & {
  * Whether this client can run the model without hurting the page: a real WebGPU adapter, enough memory, a desktop
  * device and a connection that is neither metered-on-request nor slow. Anything else keeps the plain explanation.
  */
-async function canPersonalize() {
+export async function canPersonalize() {
   const client = navigator as Client
   if (!client.gpu) return false
   if (client.deviceMemory !== undefined && client.deviceMemory < 8) return false
@@ -87,33 +87,38 @@ async function canPersonalize() {
 }
 
 type Generate = (messages: ReturnType<typeof promptFor>, options: object) => Promise<unknown>
-let model: Promise<Generate | null> | null = null
+let model: Promise<Generate> | null = null
 
-/**
- * Downloads and starts the model once, if the client can run it; resolves to null otherwise. Later calls share the
- * same promise, so calling it early (while the learner is still filling in the gaps) hides the download.
- */
-export function prepareModel() {
+/** Downloads and starts the model once; later calls share it. `onProgress` gets the downloaded fraction, 0 to 1. */
+export function loadModel(onProgress: (fraction: number) => void = () => {}) {
   model ??= (async () => {
-    if (!(await canPersonalize())) return null
-    try {
-      const { pipeline } = await import("@huggingface/transformers")
-      const generator = await pipeline("text-generation", MODEL, { dtype: "q4f16", device: "webgpu" })
-      return generator as unknown as Generate
-    } catch (error) {
-      console.warn("Personalized explanations are off:", error)
-      return null
-    }
+    const { pipeline } = await import("@huggingface/transformers")
+    const files: Record<string, { loaded: number; total: number }> = {}
+    const generator = await pipeline("text-generation", MODEL, {
+      dtype: "q4f16",
+      device: "webgpu",
+      progress_callback: (info) => {
+        if (info.status !== "progress") return
+        files[info.file] = { loaded: info.loaded, total: info.total }
+        let loaded = 0
+        let total = 0
+        for (const file of Object.values(files)) {
+          loaded += file.loaded
+          total += file.total
+        }
+        if (total) onProgress(loaded / total)
+      },
+    })
+    return generator as unknown as Generate
   })()
   return model
 }
 
-/** The analyzer's explanation rephrased for this sentence, or null when the model is not available here. */
+/** The analyzer's explanation rephrased for this sentence. */
 export async function personalize(facts: Facts) {
-  const generate = await prepareModel()
-  if (!generate) return null
+  const generate = await loadModel()
   const output = (await generate(promptFor(facts), { max_new_tokens: 160, do_sample: false })) as {
     generated_text: { role: string; content: string }[]
   }[]
-  return output[0].generated_text.at(-1)!.content.trim() || null
+  return output[0].generated_text.at(-1)!.content.trim()
 }

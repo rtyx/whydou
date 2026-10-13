@@ -20,7 +20,9 @@ type Props = { article: string; answer: string; sentence: string; explanation: E
 /** A wrong answer in the checked text. Hovering or focusing it shows the correct article and why. */
 export function WrongAnswer({ article, answer, sentence, explanation, children }: Props) {
   // On capable devices a small in-browser model rephrases the analyzer's reasoning for this sentence.
-  const personalized = usePersonalize((state) => state.results[keyOf({ sentence, article, answer, explanation })])
+  const key = keyOf({ sentence, article, answer, explanation })
+  const personalized = usePersonalize((state) => state.results[key])
+  const rephrasing = usePersonalize((state) => state.pending[key] && state.model === "ready")
   const [open, setOpen] = useState(false)
   const [shift, setShift] = useState(0)
   const [above, setAbove] = useState(false)
@@ -81,6 +83,9 @@ export function WrongAnswer({ article, answer, sentence, explanation, children }
           )}
           <span className="text-sub">{describeAnswer(answer)}</span>
           <span>{personalized ?? explanation.why}</span>
+          {(personalized || rephrasing) && (
+            <span className="text-accent">{personalized ? "✦ rephrased by on-device AI" : "✦ rephrasing…"}</span>
+          )}
           <span className="flex flex-col gap-1 border-t border-sub/30 pt-2 text-sub">
             {explanation.rules.map((rule) => (
               <span key={rule}>

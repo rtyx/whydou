@@ -4,7 +4,7 @@ import { ArticleInput } from "@/components/article-input"
 import { WrongAnswer } from "@/components/wrong-answer"
 import { explainAll, type Explanation } from "@/lib/analyze"
 import { Button } from "@/components/button"
-import { prepareModel, sentencesOf } from "@/lib/personalize"
+import { sentencesOf } from "@/lib/personalize"
 import { articlesOf, isCorrect, scoreOf, tokenize } from "@/lib/quiz"
 import { usePersonalize } from "@/stores/personalize-store"
 import { useQuiz } from "@/stores/quiz-store"
@@ -16,10 +16,11 @@ export function Quiz() {
   const sentences = useMemo(() => sentencesOf(tokens), [tokens])
   const total = articlesOf(tokens).length
   const score = scoreOf(tokens, answers)
+  const prepare = usePersonalize((state) => state.prepare)
   const personalizeAll = usePersonalize((state) => state.personalizeAll)
 
   // Start the model download while the learner fills in the gaps, so it is ready by the time they check.
-  useEffect(() => void prepareModel(), [])
+  useEffect(() => void prepare(), [prepare])
 
   // Once checked, rephrase the explanation of every wrong answer in the background, in reading order.
   useEffect(() => {
