@@ -1,11 +1,12 @@
-import { useMemo, type FormEvent } from "react"
+import { useEffect, useMemo, type FormEvent } from "react"
 
 import { ArticleInput } from "@/components/article-input"
 import { WrongAnswer } from "@/components/wrong-answer"
 import { explainAll, type Explanation } from "@/lib/analyze"
 import { Button } from "@/components/button"
-import { sentencesOf } from "@/lib/personalize"
+import { prepareModel, sentencesOf } from "@/lib/personalize"
 import { articlesOf, isCorrect, scoreOf, tokenize } from "@/lib/quiz"
+import { usePersonalize } from "@/stores/personalize-store"
 import { useQuiz } from "@/stores/quiz-store"
 
 export function Quiz() {
@@ -15,6 +16,25 @@ export function Quiz() {
   const sentences = useMemo(() => sentencesOf(tokens), [tokens])
   const total = articlesOf(tokens).length
   const score = scoreOf(tokens, answers)
+  const personalizeAll = usePersonalize((state) => state.personalizeAll)
+
+  // Start the model download while the learner fills in the gaps, so it is ready by the time they check.
+  useEffect(() => void prepareModel(), [])
+
+  // Once checked, rephrase the explanation of every wrong answer in the background, in reading order.
+  useEffect(() => {
+    if (!submitted) return
+    void personalizeAll(
+      articlesOf(tokens)
+        .filter((token) => !isCorrect(token.article, answers[token.id]))
+        .map((token) => ({
+          sentence: sentences[token.id],
+          article: token.article,
+          answer: answers[token.id] ?? "",
+          explanation: explanations[token.id],
+        })),
+    )
+  }, [submitted, tokens, answers, sentences, explanations, personalizeAll])
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault()

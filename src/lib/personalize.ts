@@ -60,49 +60,60 @@ export function promptFor({ sentence, article, answer, explanation }: Facts) {
   ]
 }
 
-type Gpu = { requestAdapter(): Promise<unknown> }
+type Gpu = { requestAdapter(): Promise<{ info?: { isFallbackAdapter?: boolean } } | null> }
+type Client = Navigator & {
+  gpu?: Gpu
+  deviceMemory?: number
+  connection?: { saveData?: boolean; effectiveType?: string }
+  userAgentData?: { mobile?: boolean }
+}
 
-/** Running a model this size on the CPU is too slow to be useful, so only WebGPU is supported. */
-export async function hasWebGpu() {
-  const gpu = (navigator as Navigator & { gpu?: Gpu }).gpu
-  if (!gpu) return false
+/**
+ * Whether this client can run the model without hurting the page: a real WebGPU adapter, enough memory, a desktop
+ * device and a connection that is neither metered-on-request nor slow. Anything else keeps the plain explanation.
+ */
+async function canPersonalize() {
+  const client = navigator as Client
+  if (!client.gpu) return false
+  if (client.deviceMemory !== undefined && client.deviceMemory < 8) return false
+  if (client.connection?.saveData || /2g|3g/.test(client.connection?.effectiveType ?? "")) return false
+  if (client.userAgentData?.mobile || matchMedia("(pointer: coarse)").matches) return false
   try {
-    return (await gpu.requestAdapter()) !== null
+    const adapter = await client.gpu.requestAdapter()
+    return adapter !== null && !adapter.info?.isFallbackAdapter
   } catch {
     return false
   }
 }
 
 type Generate = (messages: ReturnType<typeof promptFor>, options: object) => Promise<unknown>
-let model: Promise<Generate> | null = null
+let model: Promise<Generate | null> | null = null
 
-/** Downloads and starts the model once; later calls share it. `onProgress` gets a fraction between 0 and 1. */
-export function loadModel(onProgress: (fraction: number) => void) {
+/**
+ * Downloads and starts the model once, if the client can run it; resolves to null otherwise. Later calls share the
+ * same promise, so calling it early (while the learner is still filling in the gaps) hides the download.
+ */
+export function prepareModel() {
   model ??= (async () => {
-    const { pipeline } = await import("@huggingface/transformers")
-    const files: Record<string, { loaded: number; total: number }> = {}
-    const generator = await pipeline("text-generation", MODEL, {
-      dtype: "q4f16",
-      device: "webgpu",
-      progress_callback: (info) => {
-        if (info.status !== "progress") return
-        files[info.file] = { loaded: info.loaded, total: info.total }
-        const sum = Object.values(files).reduce((acc, file) => [acc[0] + file.loaded, acc[1] + file.total], [0, 0])
-        if (sum[1]) onProgress(sum[0] / sum[1])
-      },
-    })
-    return generator as unknown as Generate
+    if (!(await canPersonalize())) return null
+    try {
+      const { pipeline } = await import("@huggingface/transformers")
+      const generator = await pipeline("text-generation", MODEL, { dtype: "q4f16", device: "webgpu" })
+      return generator as unknown as Generate
+    } catch (error) {
+      console.warn("Personalized explanations are off:", error)
+      return null
+    }
   })()
-  // Let a failed download be retried.
-  model.catch(() => (model = null))
   return model
 }
 
-/** The analyzer's explanation rephrased for this sentence. */
-export async function personalize(facts: Facts, onProgress: (fraction: number) => void) {
-  const generate = await loadModel(onProgress)
+/** The analyzer's explanation rephrased for this sentence, or null when the model is not available here. */
+export async function personalize(facts: Facts) {
+  const generate = await prepareModel()
+  if (!generate) return null
   const output = (await generate(promptFor(facts), { max_new_tokens: 160, do_sample: false })) as {
     generated_text: { role: string; content: string }[]
   }[]
-  return output[0].generated_text.at(-1)!.content.trim()
+  return output[0].generated_text.at(-1)!.content.trim() || null
 }
