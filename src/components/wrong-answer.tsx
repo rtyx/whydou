@@ -2,6 +2,7 @@ import { useId, useLayoutEffect, useRef, useState, type ReactNode } from "react"
 
 import type { Explanation } from "@/lib/analyze"
 import { CASE_LABEL, GENDER_LABEL, RULES, describeForm, formatMatch } from "@/lib/grammar"
+import { keyOf, usePersonalize } from "@/stores/personalize-store"
 
 const MARGIN = 8
 
@@ -14,10 +15,12 @@ function describeAnswer(answer: string) {
   return `"${typed}" is the article for: ${matches.map(formatMatch).join(", ")}.`
 }
 
-type Props = { article: string; answer: string; explanation: Explanation; children: ReactNode }
+type Props = { article: string; answer: string; sentence: string; explanation: Explanation; children: ReactNode }
 
 /** A wrong answer in the checked text. Hovering or focusing it shows the correct article and why. */
-export function WrongAnswer({ article, answer, explanation, children }: Props) {
+export function WrongAnswer({ article, answer, sentence, explanation, children }: Props) {
+  // On capable devices a small in-browser model rephrases the analyzer's reasoning for this sentence.
+  const personalized = usePersonalize((state) => state.results[keyOf({ sentence, article, answer, explanation })])
   const [open, setOpen] = useState(false)
   const [shift, setShift] = useState(0)
   const [above, setAbove] = useState(false)
@@ -77,7 +80,7 @@ export function WrongAnswer({ article, answer, explanation, children }: Props) {
             </span>
           )}
           <span className="text-sub">{describeAnswer(answer)}</span>
-          <span>{explanation.why}</span>
+          <span>{personalized ?? explanation.why}</span>
           <span className="flex flex-col gap-1 border-t border-sub/30 pt-2 text-sub">
             {explanation.rules.map((rule) => (
               <span key={rule}>
