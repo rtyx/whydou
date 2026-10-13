@@ -1,5 +1,6 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router"
 
+import { AiStatus } from "@/components/ai-status"
 import { ThemeSwitch } from "@/components/theme-switch"
 
 export const Route = createRootRoute({
@@ -11,11 +12,14 @@ export const Route = createRootRoute({
         <div className="flex-1 bg-[#ffce00]" />
       </div>
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-8 sm:px-8">
-        <header className="flex items-center justify-between border-b-4 border-double border-sub/40 pb-4">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b-4 border-double border-sub/40 pb-4">
           <span className="font-display text-4xl leading-none font-semibold text-fg">
             why<span className="text-rot">dou</span>
           </span>
-          <ThemeSwitch />
+          <div className="flex items-center gap-2">
+            <AiStatus />
+            <ThemeSwitch />
+          </div>
         </header>
         <main className="flex flex-1 flex-col justify-center py-12">
           <Outlet />
