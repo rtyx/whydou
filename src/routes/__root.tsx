@@ -1,6 +1,5 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router"
 
-import { AiStatus } from "@/components/ai-status"
 import { ThemeSwitch } from "@/components/theme-switch"
 
 export const Route = createRootRoute({
@@ -17,7 +16,6 @@ export const Route = createRootRoute({
             why<span className="text-rot">dou</span>
           </span>
           <div className="flex items-center gap-2">
-            <AiStatus />
             <ThemeSwitch />
           </div>
         </header>

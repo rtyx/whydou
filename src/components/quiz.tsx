@@ -1,41 +1,18 @@
-import { useEffect, useMemo, type FormEvent } from "react"
+import { useMemo, type FormEvent } from "react"
 
 import { ArticleInput } from "@/components/article-input"
 import { WrongAnswer } from "@/components/wrong-answer"
 import { explainAll, type Explanation } from "@/lib/analyze"
 import { Button } from "@/components/button"
-import { sentencesOf } from "@/lib/personalize"
 import { articlesOf, isCorrect, scoreOf, tokenize } from "@/lib/quiz"
-import { usePersonalize } from "@/stores/personalize-store"
 import { useQuiz } from "@/stores/quiz-store"
 
 export function Quiz() {
   const { original, source, answers, submitted, setAnswer, submit, reset } = useQuiz()
   const tokens = useMemo(() => tokenize(original), [original])
   const explanations = useMemo(() => explainAll(tokens), [tokens])
-  const sentences = useMemo(() => sentencesOf(tokens), [tokens])
   const total = articlesOf(tokens).length
   const score = scoreOf(tokens, answers)
-  const prepare = usePersonalize((state) => state.prepare)
-  const personalizeAll = usePersonalize((state) => state.personalizeAll)
-
-  // Start the model download while the learner fills in the gaps, so it is ready by the time they check.
-  useEffect(() => void prepare(), [prepare])
-
-  // Once checked, rephrase the explanation of every wrong answer in the background, in reading order.
-  useEffect(() => {
-    if (!submitted) return
-    void personalizeAll(
-      articlesOf(tokens)
-        .filter((token) => !isCorrect(token.article, answers[token.id]))
-        .map((token) => ({
-          sentence: sentences[token.id],
-          article: token.article,
-          answer: answers[token.id] ?? "",
-          explanation: explanations[token.id],
-        })),
-    )
-  }, [submitted, tokens, answers, sentences, explanations, personalizeAll])
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault()
@@ -68,7 +45,6 @@ export function Quiz() {
               article={token.article}
               answer={answers[token.id] ?? ""}
               submitted={submitted}
-              sentence={sentences[token.id]}
               explanation={explanations[token.id]}
               onChange={(value) => setAnswer(token.id, value)}
             />
@@ -121,12 +97,11 @@ type AnswerProps = {
   article: string
   answer: string
   submitted: boolean
-  sentence: string
   explanation: Explanation
   onChange(value: string): void
 }
 
-function Answer({ article, answer, submitted, sentence, explanation, onChange }: AnswerProps) {
+function Answer({ article, answer, submitted, explanation, onChange }: AnswerProps) {
   const correct = isCorrect(article, answer)
   const input = (
     <ArticleInput
@@ -139,7 +114,7 @@ function Answer({ article, answer, submitted, sentence, explanation, onChange }:
   )
   if (!submitted || correct) return input
   return (
-    <WrongAnswer article={article} answer={answer} sentence={sentence} explanation={explanation}>
+    <WrongAnswer article={article} answer={answer} explanation={explanation}>
       {input}
     </WrongAnswer>
   )
