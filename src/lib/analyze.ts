@@ -405,7 +405,7 @@ function explainOne(form: Form, before: string, after: string): Explanation {
     certain = false
   } else {
     rules.push("word-gender")
-    parts.push(`Gender has to be learned with the noun. Here "${form}" can only be ${alternatives}.`)
+    parts.push(`Gender has to be learned with the noun.`)
     certain = false
   }
 
@@ -419,7 +419,6 @@ function explainOne(form: Form, before: string, after: string): Explanation {
   }
 
   if ((match.case === "nom" || match.case === "acc") && match.gender !== "m") rules.push("nom-acc-same")
-  parts.push(`So ${phrase.noun} is ${formatMatch(match)}: ${form}.`)
 
   return {
     phrase: phrase.text,
