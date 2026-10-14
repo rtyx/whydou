@@ -1,8 +1,8 @@
-import { useMemo, type FormEvent } from "react"
+import { useEffect, useMemo, useState, type FormEvent } from "react"
 
 import { ArticleInput } from "@/components/article-input"
 import { WrongAnswer } from "@/components/wrong-answer"
-import { explainAll, type Explanation } from "@/lib/analyze"
+import { explainAll, loadNouns, type Explanation } from "@/lib/analyze"
 import { Button } from "@/components/button"
 import { articlesOf, isCorrect, scoreOf, tokenize } from "@/lib/quiz"
 import { useQuiz } from "@/stores/quiz-store"
@@ -10,7 +10,15 @@ import { useQuiz } from "@/stores/quiz-store"
 export function Quiz() {
   const { original, source, answers, submitted, setAnswer, submit, reset } = useQuiz()
   const tokens = useMemo(() => tokenize(original), [original])
-  const explanations = useMemo(() => explainAll(tokens), [tokens])
+  const [nounsLoaded, setNounsLoaded] = useState(false)
+  useEffect(() => {
+    loadNouns().then(
+      () => setNounsLoaded(true),
+      () => {},
+    )
+  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- recompute once the noun list has arrived
+  const explanations = useMemo(() => explainAll(tokens), [tokens, nounsLoaded])
   const total = articlesOf(tokens).length
   const score = scoreOf(tokens, answers)
 

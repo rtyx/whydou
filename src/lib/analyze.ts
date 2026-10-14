@@ -113,8 +113,19 @@ const WORDS = {
 }
 
 const LEXICON = new Map<string, Gender>()
-for (const gender of ["m", "f", "n"] as const) {
-  for (const word of WORDS[gender].split(" ")) LEXICON.set(word, gender)
+const addWords = (words: Partial<Record<Gender, string>>) => {
+  for (const gender of ["m", "f", "n", "pl"] as const) {
+    for (const word of words[gender]?.split(" ") ?? []) LEXICON.set(word, gender)
+  }
+}
+addWords(WORDS)
+
+// The generated Wiktionary list is big, so it is a separate chunk. The hand-written entries above win over it.
+export async function loadNouns() {
+  const { default: nouns } = await import("./nouns.json")
+  const own = new Map(LEXICON)
+  addWords(nouns)
+  for (const [word, gender] of own) LEXICON.set(word, gender)
 }
 
 const FEMININE_SUFFIX = ["ung", "heit", "keit", "schaft", "ion", "tät", "ik", "ei", "ur", "enz", "anz", "in"]
@@ -159,15 +170,10 @@ function genderOf(noun: string): GenderEvidence | null {
 
   // Compounds: the last part decides, so take the longest known word the noun ends in.
   let best: { word: string; gender: Gender } | null = null
-  for (const [word, gender] of LEXICON) {
-    if (
-      word.length >= 4 &&
-      lower.length > word.length &&
-      lower.endsWith(word) &&
-      (!best || word.length > best.word.length)
-    ) {
-      best = { word, gender }
-    }
+  for (let i = 1; i <= lower.length - 4 && !best; i++) {
+    const word = lower.slice(i)
+    const gender = LEXICON.get(word)
+    if (gender) best = { word, gender }
   }
   if (best) {
     const last = best.word[0].toUpperCase() + best.word.slice(1)

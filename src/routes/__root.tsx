@@ -27,6 +27,13 @@ export const Route = createRootRoute({
             <kbd className="rounded bg-sub/30 px-1.5 py-0.5 text-fg">tab</kbd> next blank ·{" "}
             <kbd className="rounded bg-sub/30 px-1.5 py-0.5 text-fg">enter</kbd> check
           </p>
+          <p>
+            Noun genders from{" "}
+            <a href="https://de.wiktionary.org/" className="underline">
+              Wiktionary
+            </a>{" "}
+            via kaikki.org, CC BY-SA 4.0
+          </p>
         </footer>
       </div>
     </>
